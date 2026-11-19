@@ -13,6 +13,9 @@ Mockup dasbor riset PRIS RUPA Future Society 2026 (FKM UI dan OR IPSH BRIN):
 5. Suara warga dari 6 desa di 3 lokasi
 6. Metadata indikator dan data agregat
 
+## Dokumentasi
+- Alur pengolahan data per menu (flowchart): [docs/alur-pengolahan.md](docs/alur-pengolahan.md), versi web: https://rsuti.github.io/gizintt_rupaproject/docs/alur.html
+
 ## Prinsip data
 - Hanya data agregat tingkat kabupaten/kota dan desa.
 - Tidak ada data mikro maupun identitas informan (UU 27/2022 tentang Pelindungan Data Pribadi dan protokol etik).
