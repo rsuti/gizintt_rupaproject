@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dasbor Gizi NTT 2045</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Layout: kepala tetap + tab enam halaman; tiap halaman ringkasan di atas, rincian di bawah */
+  --bg:#F4F6F8; --panel:#FFFFFF; --ink:#18212C; --mut:#5E6B78; --line:#DCE2E8; --soft:#EBEFF3;
+  --accent:#1D4E74;
+  --sA:#2E7D6B; --sB:#2B5C8A; --sC:#9A6A14; --sD:#B5452B;
+  --sAbg:#E3F0EC; --sBbg:#E4ECF5; --sCbg:#F5EDDC; --sDbg:#F8E7E2;
+  --ok:#2E7D6B; --warn:#B98A12; --crit:#B5452B; --none:#8A96A3;
+  --display:"Source Serif 4", Cambria, Georgia, serif;
+  --body:"IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11171E; --panel:#19212A; --ink:#E6EBF0; --mut:#9AA8B5; --line:#2C3743; --soft:#222C37;
+    --accent:#7FB0D8;
+    --sA:#5CB59E; --sB:#78A6D4; --sC:#D3A651; --sD:#E07F66;
+    --sAbg:#1C3330; --sBbg:#1C2A3B; --sCbg:#352C1A; --sDbg:#3A231E;
+    --ok:#5CB59E; --warn:#D9B04A; --crit:#E07F66; --none:#7C8996;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11171E; --panel:#19212A; --ink:#E6EBF0; --mut:#9AA8B5; --line:#2C3743; --soft:#222C37;
+  --accent:#7FB0D8;
+  --sA:#5CB59E; --sB:#78A6D4; --sC:#D3A651; --sD:#E07F66;
+  --sAbg:#1C3330; --sBbg:#1C2A3B; --sCbg:#352C1A; --sDbg:#3A231E;
+  --ok:#5CB59E; --warn:#D9B04A; --crit:#E07F66; --none:#7C8996;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+button,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+header{background:var(--panel);border-bottom:1px solid var(--line)}
+.hwrap{max-width:1280px;margin:0 auto;padding:16px 20px 0}
+.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.brand h1{font-size:24px;color:var(--accent)}
+.brand p{margin:2px 0 0;color:var(--mut);font-size:13.5px}
+.ctrl{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ctrl label{font-size:12.5px;color:var(--mut);display:flex;flex-direction:column;gap:2px}
+.ctrl select{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-width:120px;cursor:pointer}
+.mock{margin-top:12px;background:var(--sCbg);color:var(--ink);border-left:4px solid var(--sC);padding:7px 12px;border-radius:6px;font-size:13px}
+nav{display:flex;gap:4px;overflow-x:auto;margin-top:12px}
+nav a{flex:none;text-decoration:none;color:var(--mut);padding:9px 14px;border-bottom:3px solid transparent;font-weight:500;font-size:14px;white-space:nowrap}
+nav a:hover{color:var(--ink)}
+nav a[aria-current="page"]{color:var(--accent);border-bottom-color:var(--accent)}
+nav a span{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;background:var(--soft);font-size:12px;margin-right:6px}
+nav a[aria-current="page"] span{background:var(--accent);color:var(--panel)}
+
+main{max-width:1280px;margin:0 auto;padding:18px 20px 40px}
+section.page{display:none;flex-direction:column;gap:16px}
+section.page.on{display:flex}
+.lead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 20px;align-items:flex-end}
+.lead h2{font-size:22px}
+.lead p{margin:4px 0 0;color:var(--mut);max-width:72ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h3{font-size:16.5px;margin-bottom:4px}
+.card .sub{color:var(--mut);font-size:13px;margin:0 0 10px}
+.g2{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:900px){.g2,.g3{grid-template-columns:1fr}}
+svg{display:block;width:100%;height:auto}
+svg text{fill:var(--mut);font-family:var(--body)}
+
+/* KPI */
+.grpT{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);font-weight:600;margin:4px 0 8px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--none);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;cursor:pointer;text-align:left}
+.kpi:hover{border-color:var(--accent)}
+.kpi .nm{font-size:13.5px;color:var(--mut)}
+.kpi .v{font-size:26px;font-weight:600;font-family:var(--display)}
+.kpi .v small{font-size:13px;font-weight:400;color:var(--mut);font-family:var(--body);margin-left:4px}
+.kpi .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pill{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--mut)}
+.pill.ok{background:var(--sAbg);color:var(--ok)} .pill.warn{background:var(--sCbg);color:var(--warn)} .pill.crit{background:var(--sDbg);color:var(--crit)}
+.chg{font-size:12.5px}
+.ctx{font-size:12.5px;color:var(--mut)}
+
+/* tile map */
+.tile{cursor:pointer}
+.tile rect{stroke:var(--panel);stroke-width:2}
+.tile.sel rect{stroke:var(--ink);stroke-width:3}
+.tile text{font-size:10.5px;pointer-events:none;font-weight:600}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--mut);align-items:center}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.tw{overflow-x:auto}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:5px 11px;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--panel);border-color:var(--accent)}
+
+.quad{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.qd{border-radius:10px;padding:10px 12px;font-size:13px}
+.qd b{font-family:var(--display);font-size:15px;display:block}
+.sig{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.sig:last-child{border-bottom:0}
+.arrow{font-weight:600}
+.quote{border-left:3px solid var(--line);padding:6px 10px;color:var(--mut);font-style:italic;font-size:13.5px;margin:6px 0}
+.btn{background:var(--accent);color:var(--panel);border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.foot{color:var(--mut);font-size:12.5px;margin-top:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <div class="top">
+      <div class="brand">
+        <h1>Dasbor Pemantauan Triple Burden NTT 2045</h1>
+        <p>PRIS RUPA Future Society 2026 · FKM UI dan OR IPSH BRIN · rancangan luaran hak cipta program komputer</p>
+      </div>
+      <div class="ctrl">
+        <label for="selYear">Tahun data
+          <select id="selYear"></select>
+        </label>
+        <label for="selKab">Kabupaten/kota
+          <select id="selKab"></select>
+        </label>
+      </div>
+    </div>
+    <div class="mock"><b>Mockup.</b> Semua angka, kelompok, dan posisi di halaman ini adalah ilustrasi untuk membahas tampilan, bukan data atau hasil riset. Batas peringatan dan daftar indikator final ditetapkan di FGD II (Mei 2027).</div>
+    <nav id="tabs" aria-label="Halaman dasbor">
+      <a href="#ringkasan"><span>1</span>Ringkasan</a>
+      <a href="#peta"><span>2</span>Peta dan lintasan</a>
+      <a href="#kelompok"><span>3</span>Kelompok kabupaten</a>
+      <a href="#skenario"><span>4</span>Skenario 2045</a>
+      <a href="#warga"><span>5</span>Suara warga</a>
+      <a href="#metadata"><span>6</span>Metadata</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- 1 RINGKASAN -->
+<section class="page" id="p-ringkasan">
+  <div class="lead">
+    <div><h2>Kondisi NTT tahun <span class="yr"></span></h2>
+    <p>Indikator inti tahunan dengan status warna dan perubahan dari tahun sebelumnya. Klik kartu untuk melihat petanya.</p></div>
+    <div class="legend"><span><i style="background:var(--ok)"></i>aman</span><span><i style="background:var(--warn)"></i>waspada</span><span><i style="background:var(--crit)"></i>perlu tindakan</span><span><i style="background:var(--none)"></i>batas belum disepakati</span></div>
+  </div>
+  <div id="kpiWrap"></div>
+  <div class="card">
+    <h3>Ke arah skenario mana NTT bergerak?</h3>
+    <p class="sub">Ringkasan dari halaman 4: posisi provinsi menurut penanda arah tahun terpilih.</p>
+    <div id="sumScen" class="ctx"></div>
+  </div>
+</section>
+
+<!-- 2 PETA -->
+<section class="page" id="p-peta">
+  <div class="lead">
+    <div><h2>Peta dan lintasan per kabupaten/kota</h2>
+    <p>Peta petak skematis 22 kabupaten/kota (posisi mengikuti letak pulau). Klik petak untuk melihat lintasan 2013 sampai tahun terpilih beserta rentang ketidakpastian model.</p></div>
+  </div>
+  <div class="chips" id="indChips" role="group" aria-label="Pilih indikator peta"></div>
+  <div class="g2">
+    <div class="card">
+      <h3 id="mapTitle"></h3>
+      <p class="sub" id="mapSub"></p>
+      <svg id="tileMap" viewBox="0 0 640 300" role="img" aria-label="Peta petak kabupaten/kota NTT"></svg>
+      <div class="legend" id="mapLeg"></div>
+    </div>
+    <div class="card">
+      <h3 id="trajTitle"></h3>
+      <p class="sub">Garis: estimasi model BYM2 + RW2. Pita: interval kredibel 95%. Titik: angka survei.</p>
+      <svg id="traj" viewBox="0 0 600 280" role="img" aria-label="Grafik lintasan"></svg>
+      <div class="ctx" id="trajNote"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 KELOMPOK -->
+<section class="page" id="p-kelompok">
+  <div class="lead">
+    <div><h2>Kelompok kabupaten menurut pola perubahan stunting</h2>
+    <p>Kabupaten dengan lintasan mirip dikelompokkan dengan metode kml (k-means untuk data longitudinal). Tiap kelompok punya profil faktor dan kaitan ke skenario.</p></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <h3>Lintasan rata-rata per kelompok</h3>
+      <p class="sub">Garis tipis: kabupaten anggota. Garis tebal: rata-rata kelompok.</p>
+      <svg id="clLines" viewBox="0 0 600 280" role="img" aria-label="Lintasan kelompok"></svg>
+    </div>
+    <div class="card">
+      <h3>Sebaran kelompok</h3>
+      <p class="sub">Klik petak untuk membuka kabupaten di halaman 2.</p>
+      <svg id="clMap" viewBox="0 0 640 300" role="img" aria-label="Peta kelompok"></svg>
+      <div class="legend" id="clLeg"></div>
+    </div>
+  </div>
+  <div class="g3" id="clCards"></div>
+</section>
+
+<!-- 4 SKENARIO -->
+<section class="page" id="p-skenario">
+  <div class="lead">
+    <div><h2>Empat skenario gizi NTT 2045 dan arah gerak saat ini</h2>
+    <p>Dua dimensi skenario: pola pangan keluarga (lokal sampai olahan murah) dan kekuatan layanan gizi. Posisi dihitung dari indeks penanda arah tiap dimensi. Skenario bukan ramalan.</p></div>
+    <div class="chips" id="scenScope" role="group" aria-label="Cakupan posisi">
+      <button class="chip" aria-pressed="true" data-v="ntt">Provinsi</button>
+      <button class="chip" aria-pressed="false" data-v="kab">Kabupaten terpilih</button>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <h3 id="quadTitle">Posisi di matriks skenario</h3>
+      <p class="sub">Titik besar: tahun terpilih. Jejak: 2019 sampai tahun terpilih.</p>
+      <svg id="quad" viewBox="0 0 560 440" role="img" aria-label="Matriks empat skenario"></svg>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card">
+        <h3>Penanda arah</h3>
+        <p class="sub">Perubahan dari tahun sebelumnya dan ke dimensi mana pergeserannya.</p>
+        <div id="signs"></div>
+      </div>
+      <div class="card">
+        <h3>Rentang stunting per skenario</h3>
+        <p class="sub">Proyeksi sebagai rentang, bukan satu angka.</p>
+        <svg id="proj" viewBox="0 0 560 230" role="img" aria-label="Rentang proyeksi"></svg>
+      </div>
+    </div>
+  </div>
+  <div class="quad" id="quadCards"></div>
+</section>
+
+<!-- 5 WARGA -->
+<section class="page" id="p-warga">
+  <div class="lead">
+    <div><h2>Suara warga dari 6 desa di 3 lokasi</h2>
+    <p>Gradien urbanisasi: TTS (perdesaan), Kabupaten Kupang (peri-urban), Kota Kupang (perkotaan). Per lokasi satu desa terpapar kota dan satu desa agraris. Nama desa belum ditetapkan.</p></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <h3>Posisi desa di matriks skenario</h3>
+      <p class="sub">Dari pemetaan partisipatif dan sesi tafsir warga. Panah: perubahan yang warga ceritakan dibanding 5 tahun lalu.</p>
+      <svg id="desaQuad" viewBox="0 0 560 420" role="img" aria-label="Posisi desa"></svg>
+    </div>
+    <div class="card">
+      <h3>Indikator dari warga</h3>
+      <p class="sub">Dikumpulkan kader per semester atau tahunan; tingkat desa.</p>
+      <div class="tw"><table id="wargaTbl"></table></div>
+      <p class="foot">Lokasi paling rinci tingkat desa. Tidak ada identitas informan (protokol etik, UU 27/2022).</p>
+    </div>
+  </div>
+  <div class="g3" id="desaCards"></div>
+</section>
+
+<!-- 6 METADATA -->
+<section class="page" id="p-metadata">
+  <div class="lead">
+    <div><h2>Metadata indikator dan data agregat</h2>
+    <p>Definisi, sumber, tingkat, frekuensi, dan batas peringatan tiap indikator. Bapperida memperbarui dasbor dengan mengganti file data saat angka baru terbit, lalu menjalankan ulang rangkaian skrip R.</p></div>
+    <button class="btn" id="copyCsv" type="button">Salin data agregat (CSV)</button>
+  </div>
+  <div class="card tw"><table id="metaTbl"></table></div>
+  <p class="foot" id="copyMsg" role="status"></p>
+</section>
+</main>
+
+<script>
+/* ---------- data ilustrasi (deterministik) ---------- */
+let seed=20451;
+const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const YEARS=[];for(let y=2013;y<=2024;y++)YEARS.push(y);
+const SURVEY=[2013,2018,2019,2021,2022,2023,2024];
+
+// nama, kode singkat, kolom, baris (petak mengikuti letak pulau)
+const KAB=[
+ ["Manggarai Barat","MBR",2,0],["Manggarai","MGR",3,0],["Manggarai Timur","MTM",4,0],["Ngada","NGD",5,0],["Nagekeo","NGK",6,0],["Ende","END",7,0],["Sikka","SKA",8,0],["Flores Timur","FLT",9,0],["Lembata","LBT",10,0],["Alor","ALR",11,0],
+ ["Sumba Barat Daya","SBD",0,1],["Sumba Barat","SBB",1,1],["Sumba Tengah","SBT",2,1],["Sumba Timur","STM",3,1],["Timor Tengah Utara","TTU",9,1],["Belu","BLU",10,1],
+ ["Sabu Raijua","SRJ",5,2],["Kota Kupang","KPG",7,2],["Kupang","KUP",8,2],["Timor Tengah Selatan","TTS",9,2],["Malaka","MLK",10,2],
+ ["Rote Ndao","RTN",7,3]
+].map(([nama,kode,c,r],i)=>({i,nama,kode,c,r}));
+
+// kelompok ilustrasi: 0 tinggi menetap, 1 turun lambat, 2 turun cepat
+const CL=[
+ {n:"K1 Tinggi menetap",c:"var(--sD)",bg:"var(--sDbg)",start:44,end:40,prof:"Bulan kering sering, akses jalan terbatas, kepadatan posyandu rendah.",scen:"Rawan ke skenario C atau D"},
+ {n:"K2 Turun lambat",c:"var(--sC)",bg:"var(--sCbg)",start:41,end:32,prof:"Pangan lokal masih dominan, layanan membaik pelan.",scen:"Bergerak dari C ke A bila layanan diperkuat"},
+ {n:"K3 Turun cepat",c:"var(--sB)",bg:"var(--sBbg)",start:36,end:22,prof:"Layanan kuat, minimarket dan pangan olahan bertambah cepat.",scen:"Rawan bergeser ke skenario B"}
+];
+const clusterOf={TTS:0,SBD:0,SBT:0,TTU:0,MLK:0,SRJ:0,MTM:0,ALR:1,BLU:1,KUP:1,SBB:1,STM:1,MGR:1,RTN:1,LBT:1,KPG:2,SKA:2,NGD:2,END:2,FLT:2,NGK:2,MBR:2};
+
+KAB.forEach(k=>{
+  k.cl=clusterOf[k.kode];const C=CL[k.cl];
+  const off=(rnd()-.5)*6, slope=(C.end-C.start)+(rnd()-.5)*4;
+  k.series={};
+  // stunting
+  k.series.stunting=YEARS.map((y,j)=>+(C.start+off+slope*(j/11)+(rnd()-.5)*1.4).toFixed(1));
+  k.series.wasting=YEARS.map((y,j)=>+(11-j*.25+(k.cl===0?2:0)+(rnd()-.5)*2).toFixed(1));
+  k.series.olahan=YEARS.map((y,j)=>+(14+j*(k.cl===2?1.1:.55)+(k.kode==="KPG"?12:0)+(rnd()-.5)*1.5).toFixed(1));
+  k.series.protein=YEARS.map((y,j)=>+(52+j*.6+(k.kode==="KPG"?9:0)-(k.cl===0?5:0)+(rnd()-.5)*2).toFixed(1));
+  k.series.kering=YEARS.map((y,j)=>Math.round(clamp(6+(k.cl===0?3:0)+(j%4===2?5:0)+(rnd()-.5)*4,0,24)));
+  k.series.harga=YEARS.map((y,j)=>Math.round((10500+j*420+(rnd()-.3)*600)/50)*50);
+  k.series.minimarket=YEARS.map((y,j)=>+clamp((k.kode==="KPG"?55:2)+j*(k.kode==="KPG"?2.5:(k.cl===2?.9:.35))+(rnd()-.5),0,100).toFixed(1));
+  k.series.posyandu=YEARS.map((y,j)=>+(2.6+j*.05-(k.cl===0?.6:0)+(rnd()-.5)*.3).toFixed(2));
+  k.series.ttd=YEARS.map((y,j)=>+clamp(30+j*4.2-(k.cl===0?10:0)+(rnd()-.5)*6,0,100).toFixed(1));
+});
+
+// indikator inti (kandidat)
+const IND=[
+ {id:"stunting",nm:"Prevalensi stunting balita",u:"%",jenis:"Tren",bad:"up",lvl:"Kab/kota",src:"SSGI, SKI (Kemenkes)",frek:"Tahunan",def:"Balita dengan TB/U < -2 SD standar WHO 2006",dim:"-",th:[25,35]},
+ {id:"wasting",nm:"Prevalensi wasting balita",u:"%",jenis:"Tren",bad:"up",lvl:"Kab/kota",src:"SSGI, SKI (Kemenkes)",frek:"Tahunan",def:"Balita dengan BB/TB < -2 SD",dim:"-",th:[7,10]},
+ {id:"overweight",nm:"Prevalensi overweight balita",u:"%",jenis:"Tren",bad:"up",lvl:"Provinsi",src:"SSGI, SKI (Kemenkes)",frek:"Tahunan",def:"Balita dengan BB/TB > +2 SD",dim:"-",prov:true},
+ {id:"ttd",nm:"Cakupan TTD remaja putri",u:"%",jenis:"Proses",bad:"down",lvl:"Kab/kota",src:"Laporan rutin Dinkes [VERIFIKASI]",frek:"Tahunan",def:"Remaja putri yang mendapat tablet tambah darah sesuai standar",dim:"Layanan",th:[60,40]},
+ {id:"olahan",nm:"Porsi pengeluaran pangan olahan",u:"%",jenis:"Peringatan dini",bad:"up",lvl:"Kab/kota",src:"Susenas Maret (BPS)",frek:"Tahunan",def:"Persentase pengeluaran makanan rumah tangga untuk pangan olahan",dim:"Pangan"},
+ {id:"protein",nm:"Konsumsi protein per kapita",u:"g/hari",jenis:"Peringatan dini",bad:"down",lvl:"Kab/kota",src:"Susenas Maret (BPS)",frek:"Tahunan",def:"Rata-rata konsumsi protein per kapita per hari",dim:"Pangan"},
+ {id:"kering",nm:"Bulan kering 24 bulan terakhir",u:"bulan",jenis:"Peringatan dini",bad:"up",lvl:"Kab/kota",src:"CHIRPS v2.0 (SPI)",frek:"Bulanan",def:"Jumlah bulan dengan SPI di bawah ambang kering",dim:"Lingkungan"},
+ {id:"harga",nm:"Harga beras medium",u:"Rp/kg",jenis:"Peringatan dini",bad:"up",lvl:"Kab/kota",src:"Panel Harga Pangan [VERIFIKASI]",frek:"Mingguan",def:"Harga eceran; komoditas final ditetapkan di FGD II",dim:"Pangan"},
+ {id:"minimarket",nm:"Desa dengan minimarket",u:"% desa",jenis:"Peringatan dini",bad:"up",lvl:"Kab/kota",src:"Podes (BPS)",frek:"±3 tahunan",def:"Persentase desa/kelurahan yang memiliki minimarket",dim:"Pangan"},
+ {id:"posyandu",nm:"Kepadatan posyandu",u:"per 1.000 balita",jenis:"Peringatan dini",bad:"down",lvl:"Kab/kota",src:"Podes (BPS)",frek:"±3 tahunan",def:"Jumlah posyandu per 1.000 balita [VERIFIKASI penyebut]",dim:"Layanan"}
+];
+const WARGA_IND=[
+ {nm:"Perubahan menu harian anak",u:"% kader",src:"Laporan kader",frek:"Per semester",def:"Kader yang melaporkan menu anak makin didominasi makanan kemasan",dim:"Pangan"},
+ {nm:"Kios makanan kemasan dekat sekolah/posyandu",u:"jumlah",src:"Pemetaan partisipatif ulang",frek:"Tahunan",def:"Kios dalam jarak yang disepakati warga",dim:"Pangan"},
+ {nm:"Kecukupan pangan saat musim kering",u:"% rumah tangga",src:"Pertanyaan singkat oleh kader",frek:"Tahunan",def:"Rumah tangga yang menyatakan pangan tidak cukup di musim kering terakhir",dim:"Lingkungan"}
+];
+
+// rata-rata provinsi (tanpa bobot, ilustrasi)
+const prov=id=>YEARS.map((y,j)=>{const m=KAB.reduce((s,k)=>s+k.series[id][j],0)/KAB.length;return id==="harga"?Math.round(m/50)*50:+m.toFixed(id==="posyandu"?2:1)});
+const PROV={};IND.forEach(d=>{if(!d.prov)PROV[d.id]=prov(d.id)});
+PROV.overweight=YEARS.map((y,j)=>+(3.1+j*.22+(rnd()-.5)*.5).toFixed(1));
+
+/* ---------- state ---------- */
+const S={year:2024,kab:KAB.find(k=>k.kode==="TTS").i,ind:"stunting",scope:"ntt"};
+const yi=()=>YEARS.indexOf(S.year);
+const fmt=(v,id)=>id==="harga"?v.toLocaleString("id-ID"):(id==="posyandu"?v.toFixed(2).replace(".",","):String(v).replace(".",","));
+
+/* ---------- helpers ---------- */
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs={},parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function clear(s){while(s.firstChild)s.removeChild(s.firstChild)}
+function niceTicks(lo,hi,n=4){const step=Math.pow(10,Math.floor(Math.log10((hi-lo)/n)));const m=[1,2,2.5,5,10].find(m=>(hi-lo)/(m*step)<=n)*step;const t=[];for(let v=Math.ceil(lo/m)*m;v<=hi+1e-9;v+=m)t.push(+v.toFixed(6));return t}
+
+function lineChart(svg,{series,ymin,ymax,xYears,W=600,H=280,yLab,mark}){
+  clear(svg);const L=48,R=16,T=14,B=30;
+  const ys=niceTicks(ymin,ymax);ymin=Math.min(ymin,ys[0]);ymax=Math.max(ymax,ys[ys.length-1]);
+  const x0=xYears[0],x1=xYears[xYears.length-1];
+  const X=v=>L+(v-x0)/(x1-x0)*(W-L-R), Y=v=>T+(1-(v-ymin)/(ymax-ymin))*(H-T-B);
+  ys.forEach(v=>{el("line",{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:"var(--line)","stroke-width":1},svg);const t=el("text",{x:L-8,y:Y(v)+4,"text-anchor":"end","font-size":11},svg);t.textContent=String(v).replace(".",",")});
+  xYears.filter(y=>y%2===1||y===x1).forEach(y=>{const t=el("text",{x:X(y),y:H-10,"text-anchor":"middle","font-size":11},svg);t.textContent=y});
+  if(yLab){const t=el("text",{x:L,y:10,"font-size":11},svg);t.textContent=yLab}
+  if(mark){el("line",{x1:X(mark),x2:X(mark),y1:T,y2:H-B,stroke:"var(--mut)","stroke-dasharray":"3 3"},svg)}
+  series.forEach(s=>{
+    if(s.band){const up=s.band.map(([x,lo,hi])=>`${X(x)},${Y(hi)}`),dn=s.band.slice().reverse().map(([x,lo,hi])=>`${X(x)},${Y(lo)}`);el("polygon",{points:up.concat(dn).join(" "),fill:s.color,"fill-opacity":.14},svg)}
+    el("polyline",{points:s.pts.map(([x,y])=>`${X(x)},${Y(y)}`).join(" "),fill:"none",stroke:s.color,"stroke-width":s.w||2.5,"stroke-opacity":s.op??1,"stroke-linejoin":"round"},svg);
+    (s.dots||[]).forEach(([x,y])=>el("circle",{cx:X(x),cy:Y(y),r:3.5,fill:"var(--panel)",stroke:s.color,"stroke-width":2},svg));
+    if(s.end){const [x,y]=s.pts[s.pts.length-1];el("circle",{cx:X(x),cy:Y(y),r:5,fill:s.color},svg)}
+  });
+}
+
+function colorScale(v,lo,hi,badUp){let t=clamp((v-lo)/(hi-lo||1),0,1);if(!badUp)t=1-t;
+  const c=[[227,240,236],[233,205,140],[219,140,110],[181,69,43]];const p=t*3,i=Math.min(2,Math.floor(p)),f=p-i;
+  const m=c[i].map((a,j)=>Math.round(a+(c[i+1][j]-a)*f));return `rgb(${m.join(",")})`}
+
+// 5 kelas warna khas gizi (hijau aman sampai merah sangat tinggi)
+const PAL=["#2E8B57","#A6CF6A","#F3D34A","#EE8A3A","#C0392B"];
+const PAL_N=["sangat rendah","rendah","sedang","tinggi","sangat tinggi"];
+// ambang prevalensi WHO-UNICEF (de Onis dkk., 2019)
+const WHO={stunting:[2.5,10,20,30],wasting:[2.5,5,10,15]};
+function classes(d,vals){
+  if(WHO[d.id])return {cuts:WHO[d.id],who:true};
+  const v=vals.slice().sort((a,b)=>a-b),q=f=>v[Math.floor(f*(v.length-1))];
+  return {cuts:[q(.2),q(.4),q(.6),q(.8)],who:false}}
+function klass(v,c,badUp){let i=c.cuts.filter(x=>v>=x).length;return badUp?i:4-i}
+function tileMap(svg,{fill,onClick,label}){
+  clear(svg);const sw=50,sh=56,ox=14,oy=14;
+  // label pulau
+  [["Flores dan Alor",ox+2*sw,oy-2],["Sumba",ox,oy+sh*1-2],["Timor",ox+9*sw,oy+sh*3+sh-2+18]].forEach(([t,x,y])=>{});
+  KAB.forEach(k=>{
+    const g=el("g",{class:"tile"+(k.i===S.kab?" sel":""),tabindex:0,role:"button","aria-label":k.nama},svg);
+    const x=ox+k.c*sw,y=oy+k.r*sh;
+    el("rect",{x,y,width:sw-4,height:sh-4,rx:6,fill:fill(k)},g);
+    const f=fill(k);let m=f.startsWith("#")?[1,3,5].map(i=>parseInt(f.slice(i,i+2),16)):f.match(/\d+/g);const light=m&&m.length>=3&&(0.299*m[0]+0.587*m[1]+0.114*m[2])>165,tc=light?"#18212C":"#FFFFFF";
+    const t=el("text",{x:x+(sw-4)/2,y:y+22,"text-anchor":"middle"},g);t.style.fill=tc;t.textContent=k.kode;
+    if(label){const t2=el("text",{x:x+(sw-4)/2,y:y+38,"text-anchor":"middle","font-size":10},g);t2.style.fill=tc;t2.textContent=label(k)}
+    const tt=el("title",{},g);tt.textContent=k.nama;
+    g.addEventListener("click",()=>onClick(k));g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onClick(k)}});
+  });
+  const t=el("text",{x:ox,y:oy+4*sh+6,"font-size":11},svg);t.textContent="Baris atas: Flores, Lembata, Alor. Tengah kiri: Sumba. Kanan bawah: Timor, Kupang, Rote, Sabu.";
+}
+
+/* ---------- indeks skenario (ilustrasi) ---------- */
+function zIdx(k,j){ // x: pangan olahan (0..1), y: layanan (0..1)
+  const s=k?k.series:null;const v=id=>s?s[id][j]:PROV[id][j];
+  const x=clamp((v("olahan")-12)/20*.6+(v("minimarket"))/70*.4,0.03,0.97);
+  const y=clamp((v("posyandu")-1.8)/1.6*.5+(v("ttd")-20)/80*.5,0.03,0.97);
+  return [x,y]}
+const scenOf=([x,y])=>y>=.5?(x<.5?"A":"B"):(x<.5?"C":"D");
+const SC={A:{s:"Lokal dan terlayani",n:"Lokal dan terlayani",c:"var(--sA)",bg:"var(--sAbg)",d:"Pangan lokal tetap dominan, posyandu dan puskesmas aktif.",o:"stunting turun nyata; kelebihan gizi tertahan",r:[[18,24],[8,14]]},
+ B:{s:"Terlayani, pangan olahan",n:"Terlayani tetapi beralih ke pangan olahan",c:"var(--sB)",bg:"var(--sBbg)",d:"Layanan kuat, jajanan dan makanan kemasan murah menggantikan pangan lokal.",o:"stunting turun; kelebihan gizi naik",r:[[20,26],[12,18]]},
+ C:{s:"Lokal, tidak terjangkau",n:"Lokal tetapi tidak terjangkau",c:"var(--sC)",bg:"var(--sCbg)",d:"Pola makan masih baik, desa terpencil sulit dijangkau layanan.",o:"stunting turun lambat",r:[[25,31],[17,25]]},
+ D:{s:"Beban berlapis",n:"Beban berlapis",c:"var(--sD)",bg:"var(--sDbg)",d:"Pangan olahan menyebar dan layanan melemah.",o:"stunting tinggi; kelebihan gizi naik",r:[[30,36],[26,34]]}};
+
+function quadFrame(svg,W,H){
+  clear(svg);const L=70,R=14,T=14,B=48;const w=(W-L-R)/2,h=(H-T-B)/2;
+  [["A",0,0],["B",1,0],["C",0,1],["D",1,1]].forEach(([q,c,r])=>{
+    el("rect",{x:L+c*w+2,y:T+r*h+2,width:w-4,height:h-4,rx:10,fill:SC[q].bg},svg);
+    const t=el("text",{x:L+c*w+14,y:T+r*h+24,"font-size":13,"font-weight":600,fill:SC[q].c},svg);t.style.fill=SC[q].c;t.textContent=q+". "+SC[q].s;
+  });
+  const lab=(x,y,s,a="middle",rot)=>{const t=el("text",{x,y,"text-anchor":a,"font-size":12},svg);if(rot)t.setAttribute("transform",`rotate(-90 ${x} ${y})`);t.textContent=s};
+  lab(L+8,H-26,"pangan lokal","start");lab(W-R-8,H-26,"pangan olahan murah","end");lab(L+(W-L-R)/2,H-8,"Pola pangan keluarga");
+  lab(22,T+h/2,"layanan kuat","middle",1);lab(22,T+h*1.5,"layanan lemah","middle",1);lab(46,T+h,"Layanan gizi","middle",1);
+  return {X:v=>L+v*(W-L-R),Y:v=>T+(1-v)*(H-T-B)};
+}
+
+/* ---------- render per halaman ---------- */
+function renderRingkasan(){
+  document.querySelectorAll(".yr").forEach(e=>e.textContent=S.year);
+  const j=yi();
+  const status=(d,v)=>{if(!d.th)return ["none","batas belum disepakati"];const [a,b]=d.th;const up=d.bad==="up";
+    if(up?v>=b:v<=b)return["crit","perlu tindakan"];if(up?v>=a:v<=a)return["warn","waspada"];return["ok","aman"]};
+  const groups=["Tren","Proses","Peringatan dini"];
+  let h="";
+  groups.forEach(g=>{
+    h+=`<div class="grpT">${g==="Tren"?"Tren beban gizi":g==="Proses"?"Proses layanan":"Peringatan dini (bergerak lebih dulu)"}</div><div class="kpis">`;
+    IND.filter(d=>d.jenis===g).forEach(d=>{
+      const s=PROV[d.id],v=s[j],p=j>0?s[j-1]:null,dv=p==null?0:v-p;const [st,stt]=status(d,v);
+      const worse=(d.bad==="up"?dv>0:dv<0);const arrow=dv===0?"tetap":(dv>0?"naik ":"turun ")+fmt(Math.abs(+dv.toFixed(2)),d.id);
+      const spark=s.slice(0,j+1);const mn=Math.min(...spark),mx=Math.max(...spark);
+      const pts=spark.map((y,i)=>`${(i/(Math.max(1,spark.length-1)))*100},${28-((y-mn)/((mx-mn)||1))*24}`).join(" ");
+      h+=`<button class="kpi" type="button" data-ind="${d.id}" style="border-left-color:var(--${st==="none"?"none":st})">
+        <span class="nm">${d.nm}${d.prov?" (provinsi)":""}</span>
+        <span class="row"><span class="v num">${fmt(v,d.id)}<small>${d.u}</small></span>
+        <svg viewBox="-2 0 104 32" style="width:96px;height:30px"><polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2"/><circle cx="${100}" cy="${28-((spark[spark.length-1]-mn)/((mx-mn)||1))*24}" r="3" fill="var(--accent)"/></svg></span>
+        <span class="row"><span class="chg num" style="color:${dv===0?"var(--mut)":worse?"var(--crit)":"var(--ok)"}">${arrow} dari ${S.year-1}</span><span class="pill ${st==="none"?"":st}">${stt}</span></span>
+      </button>`});
+    h+="</div>";
+  });
+  h+=`<p class="ctx" style="margin-top:10px">Anemia ditampilkan sebagai data konteks (SKI, ±5 tahunan, tingkat provinsi) dan tidak dipakai untuk pemantauan tahunan. Indikator warga ada di halaman 5.</p>`;
+  document.getElementById("kpiWrap").innerHTML=h;
+  document.querySelectorAll(".kpi").forEach(b=>b.addEventListener("click",()=>{S.ind=b.dataset.ind==="overweight"?"stunting":b.dataset.ind;location.hash="peta"}));
+  const pos=zIdx(null,j),q=scenOf(pos),prev=j>0?zIdx(null,j-1):pos;
+  const dx=pos[0]-prev[0],dy=pos[1]-prev[1];
+  document.getElementById("sumScen").innerHTML=`<span class="pill" style="background:${SC[q].bg};color:${SC[q].c}">Kotak ${q}: ${SC[q].n}</span>
+   <span style="margin-left:8px">Dari ${S.year-1}: pola pangan ${dx>0.005?"bergeser ke pangan olahan":dx<-0.005?"kembali ke pangan lokal":"relatif tetap"}; layanan gizi ${dy>0.005?"menguat":dy<-0.005?"melemah":"relatif tetap"}.</span>`;
+}
+
+function renderPeta(){
+  const d=IND.find(x=>x.id===S.ind),j=yi();
+  document.getElementById("indChips").innerHTML=IND.filter(x=>!x.prov).map(x=>`<button class="chip" type="button" aria-pressed="${x.id===S.ind}" data-v="${x.id}">${x.nm}</button>`).join("");
+  document.querySelectorAll("#indChips .chip").forEach(b=>b.onclick=()=>{S.ind=b.dataset.v;renderPeta()});
+  const vals=KAB.map(k=>k.series[d.id][j]);const lo=Math.min(...vals),hi=Math.max(...vals);
+  document.getElementById("mapTitle").textContent=`${d.nm}, ${S.year}`;
+  document.getElementById("mapSub").textContent=`Satuan ${d.u}. Sumber ${d.src}. Hijau = aman, merah = paling mengkhawatirkan.`;
+  const C=classes(d,vals);
+  tileMap(document.getElementById("tileMap"),{fill:k=>PAL[klass(k.series[d.id][j],C,d.bad==="up")],label:k=>fmt(k.series[d.id][j],d.id),onClick:k=>{S.kab=k.i;syncKab();renderPeta()}});
+  const f2=v=>fmt(+(+v).toFixed(d.id==="posyandu"?2:1),d.id);const cu=C.cuts;
+  const rng=[`< ${f2(cu[0])}`,`${f2(cu[0])} sampai < ${f2(cu[1])}`,`${f2(cu[1])} sampai < ${f2(cu[2])}`,`${f2(cu[2])} sampai < ${f2(cu[3])}`,`≥ ${f2(cu[3])}`];
+  const order=d.bad==="up"?[0,1,2,3,4]:[4,3,2,1,0];
+  document.getElementById("mapLeg").innerHTML=[0,1,2,3,4].map(i=>{const cnt=KAB.filter(k=>klass(k.series[d.id][j],C,d.bad==="up")===i).length;const r=rng[order.indexOf(i)];
+    return `<span><i style="background:${PAL[i]}"></i>${C.who?PAL_N[i]+" ("+r+")":r} · ${cnt} kab</span>`}).join("")+
+    `<span style="flex-basis:100%">${C.who?"Kelas mengikuti ambang prevalensi WHO-UNICEF (de Onis dkk., 2019).":"Kelas dibagi per kuintil antarkabupaten tahun terpilih; hijau = kondisi terbaik, merah = paling mengkhawatirkan."}</span>`;
+  const k=KAB[S.kab];const yrs=YEARS.slice(0,j+1);const s=k.series[d.id].slice(0,j+1);
+  const half=d.id==="harga"?400:(d.id==="posyandu"?.15:(d.id==="kering"?1.5:2));
+  const band=yrs.map((y,i)=>[y,s[i]-half*(1+.6*Math.abs(i-yrs.length/2)/yrs.length),s[i]+half*(1+.6*Math.abs(i-yrs.length/2)/yrs.length)]);
+  const isSurvey=["stunting","wasting"].includes(d.id);
+  const all=band.flatMap(b=>[b[1],b[2]]).concat(PROV[d.id].slice(0,j+1));
+  document.getElementById("trajTitle").textContent=`Lintasan ${k.nama}`;
+  lineChart(document.getElementById("traj"),{xYears:YEARS,ymin:Math.min(...all),ymax:Math.max(...all),yLab:d.u,series:[
+    {pts:yrs.map((y,i)=>[y,PROV[d.id][i]]),color:"var(--mut)",w:1.5,op:.8},
+    {pts:yrs.map((y,i)=>[y,s[i]]),color:"var(--accent)",band,end:true,dots:isSurvey?yrs.map((y,i)=>[y,s[i]]).filter(p=>SURVEY.includes(p[0])):[]}
+  ]});
+  document.getElementById("trajNote").innerHTML=`Garis abu-abu: rata-rata provinsi. Kelompok: <b style="color:${CL[k.cl].c}">${CL[k.cl].n}</b>. ${isSurvey?"Tahun tanpa survei diisi model (RW2).":""}`;
+}
+
+function renderKelompok(){
+  const svg=document.getElementById("clLines");
+  const series=[];KAB.forEach(k=>series.push({pts:YEARS.map((y,i)=>[y,k.series.stunting[i]]),color:CL[k.cl].c,w:1,op:.35}));
+  CL.forEach((c,ci)=>{const m=KAB.filter(k=>k.cl===ci);series.push({pts:YEARS.map((y,i)=>[y,+(m.reduce((s,k)=>s+k.series.stunting[i],0)/m.length).toFixed(1)]),color:c.c,w:4,end:true})});
+  const all=KAB.flatMap(k=>k.series.stunting);
+  lineChart(svg,{xYears:YEARS,ymin:Math.min(...all),ymax:Math.max(...all),yLab:"stunting %",series});
+  tileMap(document.getElementById("clMap"),{fill:k=>CL[k.cl].c,onClick:k=>{S.kab=k.i;S.ind="stunting";syncKab();location.hash="peta"}});
+  document.getElementById("clLeg").innerHTML=CL.map(c=>`<span><i style="background:${c.c}"></i>${c.n}</span>`).join("");
+  document.getElementById("clCards").innerHTML=CL.map((c,ci)=>{const m=KAB.filter(k=>k.cl===ci);
+    return `<div class="card" style="border-top:4px solid ${c.c}"><h3>${c.n}</h3><p class="sub">${m.length} kabupaten/kota</p>
+    <p style="margin:0 0 8px;font-size:13.5px">${m.map(k=>k.nama).join(", ")}</p>
+    <div class="sig"><span>Profil faktor</span><span style="text-align:right;max-width:60%">${c.prof}</span></div>
+    <div class="sig"><span>Kaitan skenario</span><span style="text-align:right;max-width:60%">${c.scen}</span></div></div>`}).join("");
+}
+
+function renderSkenario(){
+  const j=yi(),k=S.scope==="kab"?KAB[S.kab]:null;
+  document.getElementById("quadTitle").textContent="Posisi "+(k?k.nama:"Provinsi NTT")+" di matriks skenario";
+  const svg=document.getElementById("quad");const {X,Y}=quadFrame(svg,560,440);
+  if(!k){KAB.forEach(kk=>{const p=zIdx(kk,j);const c=el("circle",{cx:X(p[0]),cy:Y(p[1]),r:4,fill:"var(--mut)","fill-opacity":.45},svg);const t=el("title",{},c);t.textContent=kk.nama})}
+  const start=YEARS.indexOf(2019);const trail=[];for(let i=start;i<=j;i++)trail.push(zIdx(k,i));
+  if(trail.length>1)el("polyline",{points:trail.map(p=>`${X(p[0])},${Y(p[1])}`).join(" "),fill:"none",stroke:"var(--ink)","stroke-width":2,"stroke-dasharray":"4 4"},svg);
+  trail.forEach((p,i)=>{const last=i===trail.length-1;el("circle",{cx:X(p[0]),cy:Y(p[1]),r:last?9:3.5,fill:last?"var(--ink)":"var(--panel)",stroke:"var(--ink)","stroke-width":2},svg);
+    if(last||i===0){const t=el("text",{x:X(p[0])+12,y:Y(p[1])+4,"font-size":12,"font-weight":600},svg);t.style.fill="var(--ink)";t.textContent=last?S.year:2019}});
+  // penanda arah
+  const v=id=>k?k.series[id]:PROV[id];
+  const rows=[["olahan","Pangan"],["minimarket","Pangan"],["protein","Pangan"],["posyandu","Layanan"],["ttd","Layanan"],["kering","Lingkungan"]].map(([id,dim])=>{
+    const d=IND.find(x=>x.id===id),s=v(id),now=s[j],pv=j>0?s[j-1]:now,dv=now-pv;
+    let dir="tetap",col="var(--mut)";
+    if(Math.abs(dv)>1e-9){
+      if(dim==="Pangan"){const toOlahan=(id==="protein")?dv<0:dv>0;dir=toOlahan?"ke pangan olahan":"ke pangan lokal";col=toOlahan?"var(--sB)":"var(--sA)"}
+      else if(dim==="Layanan"){dir=dv>0?"layanan menguat":"layanan melemah";col=dv>0?"var(--sA)":"var(--sC)"}
+      else{dir=dv>0?"tekanan iklim naik":"tekanan iklim turun";col=dv>0?"var(--sD)":"var(--sA)"}}
+    return `<div class="sig"><span>${d.nm}<br><span class="ctx num">${fmt(pv,id)} menjadi ${fmt(now,id)} ${d.u}</span></span><span class="arrow" style="color:${col};text-align:right">${dir}</span></div>`});
+  document.getElementById("signs").innerHTML=rows.join("");
+  // proyeksi
+  const ps=document.getElementById("proj");clear(ps);const L=40,R=16,T=10,B=28,W=560,H=230;const X2=v=>L+(v/46)*(W-L-R);
+  [0,10,20,30,40].forEach(t=>{el("line",{x1:X2(t),x2:X2(t),y1:T,y2:H-B,stroke:"var(--line)"},ps);const tx=el("text",{x:X2(t),y:H-10,"text-anchor":"middle","font-size":11},ps);tx.textContent=t+"%"});
+  ["A","B","C","D"].forEach((q,i)=>{const y0=T+i*48;const lb=el("text",{x:4,y:y0+24,"font-size":13,"font-weight":600},ps);lb.style.fill=SC[q].c;lb.textContent=q;
+    SC[q].r.forEach(([a,b],m)=>{const yy=y0+8+m*20;el("rect",{x:X2(a),y:yy,width:X2(b)-X2(a),height:14,rx:4,fill:SC[q].c,"fill-opacity":m?1:.4},ps);const t=el("text",{x:X2(b)+6,y:yy+11,"font-size":11},ps);t.textContent=(m?"2045 ":"2030 ")+a+"–"+b});});
+  document.getElementById("quadCards").innerHTML=["A","B","C","D"].map(q=>`<div class="qd" style="background:${SC[q].bg}"><b style="color:${SC[q].c}">${q}. ${SC[q].n}</b>${SC[q].d} <span class="ctx">Arah: ${SC[q].o}.</span></div>`).join("");
+}
+
+const DESA=[
+ {lok:"TTS",tipe:"terpapar kota",p:[.42,.38],q:[.30,.36],w:[34,6,41]},
+ {lok:"TTS",tipe:"agraris",p:[.18,.22],q:[.14,.28],w:[18,2,58]},
+ {lok:"Kabupaten Kupang",tipe:"terpapar kota",p:[.66,.55],q:[.48,.50],w:[52,11,29]},
+ {lok:"Kabupaten Kupang",tipe:"agraris",p:[.30,.40],q:[.24,.42],w:[27,4,44]},
+ {lok:"Kota Kupang",tipe:"terpapar kota",p:[.84,.72],q:[.70,.66],w:[68,19,12]},
+ {lok:"Kota Kupang",tipe:"agraris",p:[.58,.62],q:[.44,.60],w:[45,8,18]}
+];
+function renderWarga(){
+  const svg=document.getElementById("desaQuad");const {X,Y}=quadFrame(svg,560,420);
+  const lc={"TTS":"var(--sD)","Kabupaten Kupang":"var(--sC)","Kota Kupang":"var(--sB)"};
+  DESA.forEach((d,i)=>{
+    el("line",{x1:X(d.q[0]),y1:Y(d.q[1]),x2:X(d.p[0]),y2:Y(d.p[1]),stroke:"var(--ink)","stroke-width":1.5,"stroke-dasharray":"3 3"},svg);
+    el("circle",{cx:X(d.q[0]),cy:Y(d.q[1]),r:3,fill:"var(--mut)"},svg);
+    const shape=d.tipe==="agraris"?el("rect",{x:X(d.p[0])-7,y:Y(d.p[1])-7,width:14,height:14,rx:2,fill:lc[d.lok]},svg):el("circle",{cx:X(d.p[0]),cy:Y(d.p[1]),r:8,fill:lc[d.lok]},svg);
+    const t=el("text",{x:X(d.p[0])+11,y:Y(d.p[1])+4,"font-size":11.5,"font-weight":600},svg);t.style.fill="var(--ink)";t.textContent="D"+(i+1);
+  });
+  const lg=el("text",{x:74,y:404,"font-size":11},svg);lg.textContent="";
+  const head=`<tr><th>Desa</th><th>Lokasi</th>${WARGA_IND.map(w=>`<th>${w.nm} (${w.u})</th>`).join("")}</tr>`;
+  document.getElementById("wargaTbl").innerHTML=head+DESA.map((d,i)=>`<tr><td><b>D${i+1}</b></td><td>${d.lok}, ${d.tipe}</td>${d.w.map(v=>`<td class="num">${v}</td>`).join("")}</tr>`).join("");
+  document.getElementById("desaCards").innerHTML=["TTS","Kabupaten Kupang","Kota Kupang"].map(l=>`<div class="card" style="border-top:4px solid ${lc[l]}">
+    <h3>${l}</h3><p class="sub">${l==="TTS"?"Perdesaan, beban stunting tertinggi":l==="Kota Kupang"?"Perkotaan, indikasi kelebihan gizi":"Peri-urban, calon lokasi beban ganda"}. Bulat = desa terpapar kota, kotak = desa agraris.</p>
+    <div class="quote">[Kutipan ibu balita, teranonimisasi; diisi setelah Kunjungan I]</div>
+    <div class="quote">[Kutipan kader posyandu tentang perubahan menu anak]</div>
+    <div class="sig"><span>Peta partisipatif</span><span>sumber pangan, layanan, sinyal</span></div>
+    <div class="sig"><span>Desa 2045 versi warga</span><span>per skenario A sampai D</span></div></div>`).join("");
+}
+
+function renderMeta(){
+  const rows=IND.map((d,i)=>[i+1,d.jenis,d.nm,d.def,d.u,d.lvl,d.src,d.frek,d.dim,"-"]).concat(WARGA_IND.map((w,i)=>[IND.length+i+1,"Warga",w.nm,w.def,w.u,"Desa lokasi",w.src,w.frek,w.dim,"-"]));
+  rows.push([rows.length+1,"Konteks","Prevalensi anemia","Hb di bawah batas normal pada kelompok sasaran","%","Provinsi","SKI (Kemenkes)","±5 tahunan","-","tidak dipantau tahunan"]);
+  document.getElementById("metaTbl").innerHTML=`<tr><th>No</th><th>Jenis</th><th>Indikator</th><th>Definisi</th><th>Satuan</th><th>Tingkat</th><th>Sumber</th><th>Frekuensi</th><th>Dimensi skenario</th><th>Batas peringatan</th></tr>`+rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("");
+}
+document.getElementById("copyCsv").addEventListener("click",async()=>{
+  const ids=IND.filter(d=>!d.prov).map(d=>d.id);
+  let csv="kab_kota,tahun,"+ids.join(",")+"\n";KAB.forEach(k=>YEARS.forEach((y,j)=>{csv+=`${k.nama},${y},${ids.map(id=>k.series[id][j]).join(",")}\n`}));
+  const msg=document.getElementById("copyMsg");
+  try{await navigator.clipboard.writeText(csv);msg.textContent=`Tersalin: ${KAB.length*YEARS.length} baris data ilustrasi. Tempel ke spreadsheet untuk melihatnya.`}
+  catch(e){msg.textContent="Browser menolak penyalinan. Coba klik sekali lagi atau izinkan akses papan klip."}
+});
+
+/* ---------- kontrol dan routing ---------- */
+const selY=document.getElementById("selYear"),selK=document.getElementById("selKab");
+YEARS.slice(6).forEach(y=>selY.add(new Option(y,y)));selY.value=S.year;
+KAB.slice().sort((a,b)=>a.nama.localeCompare(b.nama)).forEach(k=>selK.add(new Option(k.nama,k.i)));
+function syncKab(){selK.value=S.kab}
+selY.onchange=()=>{S.year=+selY.value;render()};
+selK.onchange=()=>{S.kab=+selK.value;render()};
+document.querySelectorAll("#scenScope .chip").forEach(b=>b.onclick=()=>{S.scope=b.dataset.v;document.querySelectorAll("#scenScope .chip").forEach(x=>x.setAttribute("aria-pressed",x===b));renderSkenario()});
+const PAGES=["ringkasan","peta","kelompok","skenario","warga","metadata"];
+function render(){
+  const h=location.hash.slice(1);const pg=PAGES.includes(h)?h:"ringkasan";
+  PAGES.forEach(p=>document.getElementById("p-"+p).classList.toggle("on",p===pg));
+  document.querySelectorAll("#tabs a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+pg?"page":"false"));
+  syncKab();
+  ({ringkasan:renderRingkasan,peta:renderPeta,kelompok:renderKelompok,skenario:renderSkenario,warga:renderWarga,metadata:renderMeta})[pg]();
+}
+window.addEventListener("hashchange",()=>{render();window.scrollTo(0,0)});
+render();
+</script>
+</body>
+</html>
