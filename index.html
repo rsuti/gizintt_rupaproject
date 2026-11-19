@@ -139,7 +139,7 @@ th{font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercase;lett
     </div>
     <div class="mock"><b>Mockup.</b> Semua angka, kelompok, dan posisi di halaman ini adalah ilustrasi untuk membahas tampilan, bukan data atau hasil riset. Batas peringatan dan daftar indikator final ditetapkan di FGD II (Mei 2027).</div>
     <nav id="tabs" aria-label="Halaman dasbor">
-      <a href="#ringkasan"><span>1</span>Ringkasan</a>
+      <a href="#dasbor"><span>1</span>Ringkasan</a>
       <a href="#peta"><span>2</span>Peta dan lintasan</a>
       <a href="#kelompok"><span>3</span>Kelompok kabupaten</a>
       <a href="#skenario"><span>4</span>Skenario 2045</a>
@@ -151,7 +151,7 @@ th{font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercase;lett
 
 <main>
 <!-- 1 RINGKASAN -->
-<section class="page" id="p-ringkasan">
+<section class="page" id="p-dasbor">
   <div class="lead">
     <div><h2>Kondisi NTT tahun <span class="yr"></span></h2>
     <p>Indikator inti tahunan dengan status warna dan perubahan dari tahun sebelumnya. Klik kartu untuk melihat petanya.</p></div>
@@ -575,13 +575,13 @@ function syncKab(){selK.value=S.kab}
 selY.onchange=()=>{S.year=+selY.value;render()};
 selK.onchange=()=>{S.kab=+selK.value;render()};
 document.querySelectorAll("#scenScope .chip").forEach(b=>b.onclick=()=>{S.scope=b.dataset.v;document.querySelectorAll("#scenScope .chip").forEach(x=>x.setAttribute("aria-pressed",x===b));renderSkenario()});
-const PAGES=["ringkasan","peta","kelompok","skenario","warga","metadata"];
+const PAGES=["dasbor","peta","kelompok","skenario","warga","metadata"];
 function render(){
-  const h=location.hash.slice(1);const pg=PAGES.includes(h)?h:"ringkasan";
+  const h=location.hash.slice(1);const pg=PAGES.includes(h)?h:(h==="ringkasan"?"dasbor":"dasbor");
   PAGES.forEach(p=>document.getElementById("p-"+p).classList.toggle("on",p===pg));
   document.querySelectorAll("#tabs a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+pg?"page":"false"));
   syncKab();
-  ({ringkasan:renderRingkasan,peta:renderPeta,kelompok:renderKelompok,skenario:renderSkenario,warga:renderWarga,metadata:renderMeta})[pg]();
+  ({dasbor:renderRingkasan,peta:renderPeta,kelompok:renderKelompok,skenario:renderSkenario,warga:renderWarga,metadata:renderMeta})[pg]();
 }
 window.addEventListener("hashchange",()=>{render();window.scrollTo(0,0)});
 render();
