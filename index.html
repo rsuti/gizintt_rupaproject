@@ -145,7 +145,7 @@ th{font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercase;lett
       <a href="#skenario"><span>4</span>Skenario 2045</a>
       <a href="#warga"><span>5</span>Suara warga</a>
       <a href="#metadata"><span>6</span>Metadata</a>
-      <a href="https://rsuti.github.io/gizintt_rupaproject/docs/alur.html"><span>?</span>Alur pengolahan</a>
+      <a href="#alur"><span>7</span>Alur pengolahan</a>
     </nav>
   </div>
 </header>
@@ -263,6 +263,15 @@ th{font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercase;lett
     </div>
   </div>
   <div class="g3" id="desaCards"></div>
+</section>
+
+<!-- 7 ALUR -->
+<section class="page" id="p-alur">
+  <div class="lead">
+    <div><h2>Alur pengolahan data</h2>
+    <p>Dokumentasi flowchart pengolahan data untuk tiap menu dasbor.</p></div>
+  </div>
+  <div class="card"><h3>Sedang direvisi</h3><p class="sub" style="margin:0">Dokumentasi alur pengolahan akan ditampilkan di sini setelah revisi selesai.</p></div>
 </section>
 
 <!-- 6 METADATA -->
@@ -576,13 +585,13 @@ function syncKab(){selK.value=S.kab}
 selY.onchange=()=>{S.year=+selY.value;render()};
 selK.onchange=()=>{S.kab=+selK.value;render()};
 document.querySelectorAll("#scenScope .chip").forEach(b=>b.onclick=()=>{S.scope=b.dataset.v;document.querySelectorAll("#scenScope .chip").forEach(x=>x.setAttribute("aria-pressed",x===b));renderSkenario()});
-const PAGES=["dasbor","peta","kelompok","skenario","warga","metadata"];
+const PAGES=["dasbor","peta","kelompok","skenario","warga","metadata","alur"];
 function render(){
   const h=location.hash.slice(1);const pg=PAGES.includes(h)?h:(h==="ringkasan"?"dasbor":"dasbor");
   PAGES.forEach(p=>document.getElementById("p-"+p).classList.toggle("on",p===pg));
   document.querySelectorAll("#tabs a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+pg?"page":"false"));
   syncKab();
-  ({dasbor:renderRingkasan,peta:renderPeta,kelompok:renderKelompok,skenario:renderSkenario,warga:renderWarga,metadata:renderMeta})[pg]();
+  ({dasbor:renderRingkasan,peta:renderPeta,kelompok:renderKelompok,skenario:renderSkenario,warga:renderWarga,metadata:renderMeta,alur:()=>{}})[pg]();
 }
 window.addEventListener("hashchange",()=>{render();window.scrollTo(0,0)});
 render();
